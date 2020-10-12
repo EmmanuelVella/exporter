@@ -13,36 +13,31 @@ declare(strict_types=1);
 
 namespace Sonata\Exporter\Tests\Source;
 
-use Doctrine\ORM\Configuration;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Query;
 use PHPUnit\Framework\TestCase;
-use Sonata\Exporter\Tests\Source\Fixtures\DoctrineORMQuerySourceIterator;
+use Sonata\Exporter\Source\AbstractPropertySourceIterator;
 use Sonata\Exporter\Tests\Source\Fixtures\ObjectWithToString;
 
-/**
- * @author Joseph Maarek <josephmaarek@gmail.com>
- */
-final class DoctrineORMQuerySourceIteratorTest extends TestCase
+final class PropertySourceIterator extends AbstractPropertySourceIterator
 {
-    /**
-     * @var Query
-     */
-    private $query;
-
-    protected function setUp(): void
+    public function rewind(): void
     {
-        $entityManager = $this->createMock(EntityManager::class);
-        $entityManager->method('getConfiguration')->willReturn(new Configuration());
-        $this->query = new Query($entityManager);
+        $this->iterator->rewind();
     }
 
+    public function getValue($value)
+    {
+        return parent::getValue($value);
+    }
+}
+
+final class AbstractPropertySourceIteratorTest extends TestCase
+{
     /**
      * @dataProvider getValueProvider
      */
     public function testGetValue($value, $expected, $dateFormat = 'r'): void
     {
-        $iterator = new DoctrineORMQuerySourceIterator($this->query, [], $dateFormat);
+        $iterator = new PropertySourceIterator([], $dateFormat);
         $this->assertSame($expected, $iterator->getValue($value));
     }
 
